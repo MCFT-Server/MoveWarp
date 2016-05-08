@@ -1,0 +1,21 @@
+name: MoveWarp
+main: movewarp.Main
+api: ["1.0.0"]
+version: "1.0.0"
+author: maru
+
+commands:
+ makewarp:
+  usage: "/makewarp"
+  description: "Make warp touch vector"
+  permission: movewarp.commands.makewarp
+
+permissions:
+ movewarp.*:
+  default: OP
+  children:
+   movewarp.commands.*:
+    default: OP
+    children:
+     movewarp.commands.makewarp:
+      default: OP
