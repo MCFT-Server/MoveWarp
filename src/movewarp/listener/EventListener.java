@@ -46,41 +46,29 @@ public class EventListener extends BaseListener<Main> {
 	}
 	
 	@EventHandler
-	public void onTouch(PlayerInteractEvent event) {
-		Thread t1 = new Thread() {
-			public void run() {
-				Player player = event.getPlayer();
-				if (!makeQueue.containsKey(player.getName())) return;
-				if (makeQueue.get(player.getName()) == 1) {
-					firstVector.put(player.getName(), posToString(event.getBlock()));
-					makeQueue.put(player.getName(), 2);
-					plugin.getDB().message(player, "Completly set start position.");
-					plugin.getDB().message(player, "Touch second position.");
-				} else {
-					String secondVector = posToString(event.getBlock());
-					plugin.getDB().getDB("warplist").set(firstVector.get(player.getName()), secondVector);
-					plugin.getDB().message(player, "Create warp successful.");
-					makeQueue.remove(player.getName());
-					firstVector.remove(player.getName());
-				}
-			}
-		};
-		Thread t2 = new Thread() {
-			public void run() {
-				String destr = plugin.getDB().getDB("warplist").getString(posToString(event.getBlock()));
-				if (destr == null || destr.equals("")) return;
-				Position des = stringToPos(destr);
-				event.getPlayer().teleport(des);
-			}
-		};
-		t1.start();
-		t2.start();
-		try {
-			t2.join();
-			t2.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+	public void onTouchMake(PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		if (!makeQueue.containsKey(player.getName())) return;
+		if (makeQueue.get(player.getName()) == 1) {
+			firstVector.put(player.getName(), posToString(event.getBlock()));
+			makeQueue.put(player.getName(), 2);
+			plugin.getDB().message(player, "Completly set start position.");
+			plugin.getDB().message(player, "Touch second position.");
+		} else {
+			String secondVector = posToString(event.getBlock());
+			plugin.getDB().getDB("warplist").set(firstVector.get(player.getName()), secondVector);
+			plugin.getDB().message(player, "Create warp successful.");
+			makeQueue.remove(player.getName());
+			firstVector.remove(player.getName());
 		}
+	}
+	
+	@EventHandler
+	public void onTouchMove(PlayerInteractEvent event) {
+		String destr = plugin.getDB().getDB("warplist").getString(posToString(event.getBlock()));
+		if (destr == null || destr.equals("")) return;
+		Position des = getUpPos(stringToPos(destr));
+		event.getPlayer().teleport(des);
 	}
 	
 	@EventHandler
